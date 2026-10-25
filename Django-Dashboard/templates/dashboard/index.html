@@ -1,0 +1,102 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block title %}Dashboard — Twitter Sentiment{% endblock %}
+
+{% block content %}
+{% if len_data == 0 %}
+  <div class="card empty">
+    {% if db_error %}
+      <h2>MongoDB is not reachable</h2>
+      <p>{{ db_error }}</p>
+      <p>Start the stack: <code>docker compose -f zk-single-kafka-single.yml up -d</code></p>
+    {% else %}
+      <h2>No tweets in MongoDB yet</h2>
+      <p>The <code>bigdata_project.tweets</code> collection is empty.</p>
+    {% endif %}
+    <p>Start the pipeline, then refresh this page:</p>
+    <p>
+      <code>python Kafka-PySpark/producer-validation-tweets.py</code><br>
+      <code>python Kafka-PySpark/consumer-pyspark.py</code>
+    </p>
+  </div>
+{% else %}
+
+  <div class="grid stats">
+    <div class="stat">
+      <div class="label">Total tweets</div>
+      <div class="value">{{ len_data }}</div>
+      <div class="sub">classified &amp; stored</div>
+    </div>
+    {% for stat in sentiment_stats %}
+      <div class="stat {{ stat.label|lower }}">
+        <div class="label">{{ stat.label }}</div>
+        <div class="value">{{ stat.rate }}%</div>
+        <div class="sub">{{ stat.count }} tweets</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid charts">
+    <div class="card">
+      <h2>Sentiment distribution</h2>
+      <canvas id="pieChart" height="260"></canvas>
+    </div>
+    <div class="card">
+      <h2>Tweets per sentiment</h2>
+      <canvas id="barChart" height="260"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Top word frequencies per class</h2>
+    <img class="plot"
+         src="{% static 'imgs/Word_Frequencies_for_all_classes.png' %}?v={{ len_data }}"
+         alt="Top word frequencies for each sentiment class">
+  </div>
+
+  <div class="card">
+    <h2>Classified tweets ({{ len_data }})</h2>
+    <table>
+      <thead>
+        <tr><th style="width:60px">#</th><th>Tweet</th><th style="width:130px">Prediction</th></tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ row.tweet }}</td>
+            <td><span class="badge {{ row.prediction }}">{{ row.prediction }}</span></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if len_data %}
+<script>
+  const labels = [{% for stat in sentiment_stats %}"{{ stat.label|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+  const counts = [{% for stat in sentiment_stats %}{{ stat.count }}{% if not forloop.last %},{% endif %}{% endfor %}];
+  const colors = {Negative:"#e5484d", Positive:"#2f6fed", Neutral:"#2f9e68", Irrelevant:"#8b5cf6"};
+  const bg = labels.map(l => colors[l] || "#9ca3af");
+
+  new Chart(document.getElementById("pieChart"), {
+    type: "pie",
+    data: { labels, datasets: [{ data: counts, backgroundColor: bg, borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false,
+               plugins: { legend: { position: "bottom" } } }
+  });
+
+  new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: { labels, datasets: [{ label: "Tweets", data: counts, backgroundColor: bg, borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false,
+               plugins: { legend: { display: false } },
+               scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+</script>
+{% endif %}
+{% endblock %}

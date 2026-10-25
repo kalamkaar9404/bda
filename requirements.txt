@@ -1,0 +1,23 @@
+# Python 3.10 / 3.11 is required (PySpark 3.5.x does not support 3.12+ workers reliably).
+# Install into the project venv:  py -3.10 -m venv .venv && .venv\Scripts\pip install -r requirements.txt
+
+# --- Web dashboard ---
+Django==5.0.6
+
+# --- Big data / ML ---
+pyspark==3.5.4
+
+# --- Kafka client ---
+# NOTE: the PyPI package "kafka" (1.3.5) is a dead Python-2 mirror and does NOT
+# provide the `kafka` module used by this project. kafka-python is the real one.
+kafka-python==2.2.15
+
+# --- MongoDB driver ---
+pymongo==4.10.1
+
+# --- NLP / data / plotting ---
+nltk==3.9.1
+numpy==1.26.4
+pandas==2.2.3
+matplotlib==3.9.2
+seaborn==0.13.2

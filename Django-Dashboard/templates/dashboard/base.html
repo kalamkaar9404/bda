@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Twitter Sentiment Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'css/css-reset.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/myCss-fm.css' %}">
+  <style>
+    :root{
+      --bg:#f4f6fa; --card:#fff; --ink:#1b2130; --muted:#6b7280; --line:#e4e8f0;
+      --negative:#e5484d; --positive:#2f6fed; --neutral:#2f9e68; --irrelevant:#8b5cf6;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);
+         font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;}
+    header.topbar{background:#101729;color:#fff;padding:18px 28px;display:flex;
+         align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    header.topbar h1{margin:0;font-size:1.15rem;letter-spacing:.2px}
+    header.topbar nav a{color:#c7d2fe;text-decoration:none;margin-left:18px;font-size:.92rem}
+    header.topbar nav a:hover,header.topbar nav a.active{color:#fff;text-decoration:underline}
+    main{max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+          padding:20px;margin-bottom:22px;box-shadow:0 1px 3px rgba(16,23,41,.06)}
+    .card h2{margin:0 0 14px;font-size:1rem;text-transform:uppercase;
+             letter-spacing:.7px;color:var(--muted)}
+    .grid{display:grid;gap:18px}
+    .grid.stats{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+    .grid.charts{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+    .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+    .stat .label{font-size:.78rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+    .stat .value{font-size:2rem;font-weight:650;margin-top:6px}
+    .stat .sub{font-size:.85rem;color:var(--muted)}
+    .stat.negative{border-left:4px solid var(--negative)}
+    .stat.positive{border-left:4px solid var(--positive)}
+    .stat.neutral{border-left:4px solid var(--neutral)}
+    .stat.irrelevant{border-left:4px solid var(--irrelevant)}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font-size:.76rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+    .badge{display:inline-block;padding:3px 10px;border-radius:999px;
+           font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap}
+    .badge.Negative{background:var(--negative)} .badge.Positive{background:var(--positive)}
+    .badge.Neutral{background:var(--neutral)}  .badge.Irrelevant{background:var(--irrelevant)}
+    img.plot{max-width:100%;height:auto;border-radius:8px}
+    .empty{text-align:center;padding:48px 20px;color:var(--muted)}
+    .empty code{background:#eef1f7;padding:2px 6px;border-radius:4px;font-size:.85rem}
+    textarea{width:100%;min-height:130px;padding:12px;border:1px solid var(--line);
+             border-radius:8px;font:inherit;resize:vertical}
+    button{background:#2f6fed;color:#fff;border:0;border-radius:8px;padding:11px 22px;
+           font:inherit;font-weight:600;cursor:pointer;margin-top:12px}
+    button:hover{background:#2559c8}
+    .alert{padding:12px 14px;border-radius:8px;margin-bottom:14px;font-size:.92rem}
+    .alert.error{background:#fdecec;color:#9b1c20;border:1px solid #f5c2c3}
+    .result{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:10px;background:#fafbfe}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Real-Time Twitter Sentiment Analysis</h1>
+    <nav>
+      <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
+      <a href="{% url 'classify' %}" {% if request.resolver_match.url_name == 'classify' %}class="active"{% endif %}>Classify text</a>
+      <a href="/admin/">Admin</a>
+    </nav>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

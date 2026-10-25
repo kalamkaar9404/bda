@@ -1,0 +1,43 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Classify text — Twitter Sentiment{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Classify your own text</h2>
+
+  {% if error %}
+    <div class="alert error">{{ error_text }}</div>
+  {% endif %}
+
+  <form method="post" action="{% url 'classify' %}">
+    {% csrf_token %}
+    <label for="text">Tweet / text to classify</label>
+    <textarea id="text" name="text" placeholder="Type or paste a tweet here...">{{ text }}</textarea>
+    <button type="submit">Classify</button>
+  </form>
+
+  {% if prediction %}
+    <div class="result">
+      <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.8px;color:#6b7280">
+        Predicted sentiment
+      </div>
+      <div style="margin-top:8px">
+        <span class="badge {{ prediction }}" style="font-size:1rem;padding:6px 16px">{{ prediction }}</span>
+      </div>
+      <p style="margin:14px 0 0;color:#6b7280;font-size:.9rem">
+        Input ({{ text_len }} characters): “{{ text }}”
+      </p>
+    </div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>How it works</h2>
+  <p style="color:#6b7280;font-size:.92rem;line-height:1.6">
+    The text is cleaned (URLs, mentions, hashtags and non-alphabetic characters removed, lowercased)
+    and passed through the trained PySpark MLlib pipeline:
+    <strong>Tokenizer → StopWordsRemover → CountVectorizer → LogisticRegression</strong>.
+    The model returns one of four classes: Negative, Positive, Neutral or Irrelevant.
+  </p>
+</div>
+{% endblock %}

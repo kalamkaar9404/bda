@@ -1,0 +1,7 @@
+tweet_id,account,label,full_text
+1001,Borderlands,positive,"Loving the new Borderlands update, the loot feels great!"
+1002,Microsoft,neg,"Windows update broke my drivers again. Awful."
+1003,Nvidia,Neutral,"Nvidia announced a driver release today."
+1004,Verizon,unrelated,"Just made some banana bread, unrelated to anything."
+1005,Amazon,positive,"Delivery arrived early and packaging was perfect."
+1006,Google,,"No review label yet so this row should be skipped."

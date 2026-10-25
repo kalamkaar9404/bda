@@ -1,0 +1,29 @@
+# Trains the PySpark MLlib model inside a Linux container.
+#
+# Why: Spark can train fine on Windows, but WRITING the saved model goes through
+# Hadoop's native code, which needs winutils.exe. Rather than installing that
+# third-party binary, train in Linux — the model lands in the bind-mounted
+# project folder and the Windows-side consumer and Django dashboard read it
+# natively without any Hadoop requirement.
+#
+# Usage:
+#   docker compose -f docker-compose.train.yml run --rm trainer
+
+services:
+  trainer:
+    image: python:3.10-slim
+    container_name: sentiment-trainer
+    working_dir: /project
+    volumes:
+      - .:/project
+    environment:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    command: >
+      bash -c "
+      set -e;
+      echo '[docker] Installing Java 17 and PySpark...';
+      apt-get update -qq && apt-get install -y -qq --no-install-recommends openjdk-17-jre-headless > /dev/null;
+      pip install -q pyspark==3.5.4 numpy==1.26.4;
+      echo '[docker] Training...';
+      python train_model.py
+      "
